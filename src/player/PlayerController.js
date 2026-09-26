@@ -3,32 +3,22 @@ import { CONFIG } from '../config.js';
 import { heightAt } from '../world/Terrain.js';
 
 export class PlayerController {
-  constructor(player, camera, canvas) {
-    this.player = player; this.camera = camera; this.canvas = canvas;
-    this.keys = new Set(); this.enabled = false; this.yaw = 0; this.pitch = CONFIG.camera.pitch; this.distance = CONFIG.camera.distance;
+  constructor(player, camera, input) {
+    this.player = player; this.camera = camera; this.input = input;
+    this.yaw = 0; this.pitch = CONFIG.camera.pitch; this.distance = CONFIG.camera.distance;
     this.velocity = new THREE.Vector3(); this.direction = new THREE.Vector3(); this.target = new THREE.Vector3(); this.desired = new THREE.Vector3();
-    this.dragging = false;
-    window.addEventListener('keydown', e => {
-      if (this.enabled && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].includes(e.code)) { e.preventDefault(); this.keys.add(e.code); }
-    });
-    window.addEventListener('keyup', e => this.keys.delete(e.code));
-    window.addEventListener('blur', () => this.clear());
-    canvas.addEventListener('pointerdown', e => { if (this.enabled && e.button === 0) { this.dragging = true; canvas.setPointerCapture(e.pointerId); } });
-    canvas.addEventListener('pointerup', () => this.dragging = false);
-    canvas.addEventListener('lostpointercapture', () => this.dragging = false);
-    canvas.addEventListener('pointermove', e => {
-      if (!this.enabled || !this.dragging) return;
-      this.yaw -= e.movementX * 0.005; this.pitch = THREE.MathUtils.clamp(this.pitch + e.movementY * 0.004, 0.12, 0.88);
-    });
-    canvas.addEventListener('wheel', e => { if (this.enabled) { e.preventDefault(); this.distance = THREE.MathUtils.clamp(this.distance + e.deltaY * 0.012, CONFIG.camera.minDistance, CONFIG.camera.maxDistance); } }, { passive: false });
   }
-  clear() { this.keys.clear(); this.dragging = false; this.velocity.set(0, 0, 0); this.player.speed = 0; }
+  get enabled() { return this.input.enabled; }
+  set enabled(value) { this.input.enabled = value; }
+  clear() { this.input.clear(); this.velocity.set(0, 0, 0); this.player.speed = 0; }
   update(dt) {
-    const pressed = (...keys) => keys.some(k => this.keys.has(k));
-    const x = Number(pressed('KeyD', 'ArrowRight')) - Number(pressed('KeyA', 'ArrowLeft'));
-    const z = Number(pressed('KeyS', 'ArrowDown')) - Number(pressed('KeyW', 'ArrowUp'));
-    this.direction.set(this.enabled ? x : 0, 0, this.enabled ? z : 0).normalize().applyAxisAngle(THREE.Object3D.DEFAULT_UP, this.yaw);
-    const speed = pressed('ShiftLeft', 'ShiftRight') ? CONFIG.jogSpeed : CONFIG.walkSpeed;
+    const input = this.input; input.sample();
+    this.yaw -= input.cameraDeltaX * 0.005;
+    this.pitch = THREE.MathUtils.clamp(this.pitch + input.cameraDeltaY * 0.004, 0.12, 0.88);
+    this.distance = THREE.MathUtils.clamp(this.distance + input.zoomDelta, CONFIG.camera.minDistance, CONFIG.camera.maxDistance);
+    input.cameraDeltaX = input.cameraDeltaY = input.zoomDelta = 0;
+    this.direction.set(input.moveX, 0, input.moveY).applyAxisAngle(THREE.Object3D.DEFAULT_UP, this.yaw);
+    const speed = input.jogPressed ? CONFIG.jogSpeed : CONFIG.walkSpeed;
     this.direction.multiplyScalar(speed * (this.player.actionTime > 0 ? 0.25 : 1));
     this.velocity.lerp(this.direction, 1 - Math.exp(-10 * dt));
     const p = this.player.group.position;

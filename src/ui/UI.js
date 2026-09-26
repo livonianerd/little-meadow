@@ -18,6 +18,7 @@ export class UI {
           <p class="tagline">Wander. Gather. Be kind.</p>
           <p class="intro">A sunny field, a handful of flowers,<br>and nowhere you need to be.</p>
           <button id="start" class="primary">Start Exploring <span aria-hidden="true">↗</span></button>
+          <p class="touch-hint">Use the left control to walk.<br>Drag the meadow to look around.</p>
           <p class="no-pressure">There is no winning or losing.<br>Stay as long as you like.</p>
         </main>
         <div class="scene-caption"><span class="caption-line"></span><span>A little kindness grows here.</span></div>
@@ -29,6 +30,7 @@ export class UI {
         <div class="location"><span class="location-dot"></span> The sunny meadow</div>
         <div id="message" role="status" hidden></div><div id="reward" aria-live="polite" hidden></div>
         <div id="prompt" class="glass" hidden><kbd>E</kbd><span></span></div>
+        <div id="touch-controls"><div id="joystick" aria-label="Movement joystick"><span></span></div><button id="touch-action" disabled>Explore</button></div>
         <div id="controls"><span><kbd>W A S D</kbd> wander</span><span><kbd>SHIFT</kbd> jog</span><span><span class="mouse-icon">↔</span> drag to look</span><span>scroll to get closer</span></div>
         <div id="home-direction" hidden><span>⌂</span> <span id="home-text">Picnic tree</span></div>
         <p id="save-note" hidden>Saving is unavailable in this browser. You can still explore.</p>
@@ -36,12 +38,21 @@ export class UI {
       <div id="menu-overlay" class="overlay" hidden>
         <section class="menu-card" role="dialog" aria-modal="true" aria-labelledby="menu-title">
           <div class="menu-flower">${icons.flower}</div><div class="eyebrow">TAKE YOUR TIME</div><h2 id="menu-title">A little pause</h2><p>The meadow will be right here.</p>
-          <div id="menu-main"><button id="resume" class="primary">Resume exploring <span>↗</span></button><button class="menu-row sound-toggle">Sound <span id="sound-state">On</span></button><button id="about-button" class="menu-row">About the meadow <span>↗</span></button><button id="restart-button" class="menu-row">Restart Meadow <span>↻</span></button><p class="saved">Your kindness is saved as you go.</p></div>
-          <div id="about-panel" hidden><p>A small place to wander, gather, and be kind. Give flowers to Mom at the picnic tree, or share an acorn with a squirrel.</p><p>No winning. No losing. Just a little joy.</p><p class="about-controls">WASD / arrows · Walk<br>Shift · Jog &nbsp; E · Interact<br>Mouse drag · Look &nbsp; Scroll · Zoom<br>Esc · Pause</p><p id="memories"></p><button class="back-button secondary">Back to menu</button></div>
+          <div id="menu-main"><button id="resume" class="primary">Resume exploring <span>↗</span></button><button class="menu-row sound-toggle">Sound <span id="sound-state">On</span></button><button id="fullscreen-button" class="menu-row" hidden>Fullscreen <span>⛶</span></button><button id="about-button" class="menu-row">About the meadow <span>↗</span></button><button id="restart-button" class="menu-row">Restart Meadow <span>↻</span></button><p class="saved">Your kindness is saved as you go.</p></div>
+          <div id="about-panel" hidden><p>A small place to wander, gather, and be kind. Give flowers to Mom at the picnic tree, or share an acorn with a squirrel.</p><p>No winning. No losing. Just a little joy.</p><p class="about-controls">WASD / arrows · Walk<br>Shift · Jog &nbsp; E · Interact<br>Mouse drag · Look &nbsp; Scroll · Zoom<br>Esc · Pause<br><span class="touch-hint">Left joystick · Walk<br>Drag meadow · Look &nbsp; Pinch · Zoom<br>Action button · Interact</span></p><p id="memories"></p><button class="back-button secondary">Back to menu</button></div>
           <div id="reset-panel" hidden><h3>A fresh little beginning?</h3><p>This clears your kindness, gifts given, and held flowers and acorns, and returns you to the picnic tree.</p><p>You can keep exploring for as long as you like without restarting.</p><button id="confirm-reset" class="primary">Yes, restart the meadow</button><button class="back-button secondary">Keep my meadow</button></div>
         </section>
       </div>`;
     container.append(layer); this.layer = layer;
+    const fullscreen = this.$('fullscreen-button');
+    fullscreen.hidden = !document.fullscreenEnabled;
+    fullscreen.onclick = async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await container.requestFullscreen();
+      } catch { fullscreen.textContent = 'Fullscreen unavailable'; }
+    };
+    document.addEventListener('fullscreenchange', () => { fullscreen.textContent = document.fullscreenElement ? 'Exit fullscreen ⛶' : 'Fullscreen ⛶'; });
     this.$('start').onclick = () => callbacks.start();
     this.$('menu-button').onclick = () => callbacks.pause();
     this.$('resume').onclick = () => callbacks.resume();
@@ -66,7 +77,7 @@ export class UI {
     this.$('flowers').textContent = inventory.flowers; this.$('acorns').textContent = inventory.acorns; this.$('kindness').textContent = score.kindness;
     this.$('memories').textContent = `${score.flowersGiven} flowers shared with Mom · ${score.squirrelsFed} squirrels treated`;
   }
-  prompt(text) { this.$('prompt').hidden = !text; if (text) this.$('prompt').querySelector('span').textContent = text; }
+  prompt(text) { if (this.promptText === text) return; this.promptText = text; this.$('touch-action').disabled = !text; this.$('touch-action').textContent = text || 'Explore'; this.$('prompt').hidden = !text; if (text) this.$('prompt').querySelector('span').textContent = text; }
   message(text) { this.$('message').textContent = text; this.$('message').hidden = false; this.messageTime = 4.5; }
   reward(points) { this.$('reward').textContent = `♡ +${points} kindness`; this.$('reward').hidden = false; this.rewardTime = 2.5; }
   muted(value) {

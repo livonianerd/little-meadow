@@ -5,3 +5,41 @@
 @media(max-height:720px){.welcome{top:49%}h1{font-size:80px;margin:22px 0}.tagline{font-size:21px;margin-bottom:14px}.intro{margin-bottom:20px}.no-pressure{margin-top:12px}.landing-footer{height:55px}.scene-caption{bottom:95px}}
 @media(max-width:760px){.edition{display:none}.landing-header{top:20px;left:6%;right:6%}.landing-header .icon-button{margin-left:auto}.welcome{left:9%}h1{font-size:80px}.landing-footer{left:6%;right:6%;font-size:7px;letter-spacing:1px}.landing-footer>span:nth-child(2){display:none}.scene-caption{display:none}#landing{background:linear-gradient(90deg,#f4f4dfe8,#f4f4dfad 55%,#f4f4df10)}.inventory{left:14px;top:15px;padding:12px;gap:12px}.counter{gap:6px}.counter-label{display:none}.top-right{right:14px;top:15px;gap:8px}.kindness{padding:11px 13px;min-width:95px}.location{left:18px;top:85px}#controls{gap:12px;font-size:8px;padding:9px 13px;bottom:20px}#controls>span:last-child{display:none}#home-direction{bottom:69px;left:16px}#message{font-size:16px}#reward{right:58px;top:91px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* The meadow fills the changing browser viewport; menus keep their own scroll. */
+html,body{width:100%;height:100%;overscroll-behavior:none}
+#app{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden}
+#ui{position:absolute}
+button{touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.overlay{padding: max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.menu-card{max-height:100%;overscroll-behavior:contain;touch-action:pan-y}
+.touch-hint,#touch-controls{display:none}
+.touch-controls .touch-hint{display:block;font-size:12px;line-height:1.6;color:#657557}
+.touch-controls #touch-controls{display:block}
+.touch-controls #controls,.touch-controls #prompt{display:none}
+#joystick{position:absolute;left:max(22px,env(safe-area-inset-left));bottom:calc(22px + env(safe-area-inset-bottom));width:144px;height:144px;border-radius:50%;background:#f8f5e754;border:2px solid #fffbed88;box-shadow:0 3px 20px #34482718;display:grid;place-items:center;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;opacity:.65}
+#joystick span{width:58px;height:58px;border-radius:50%;background:#f8f5e7ba;border:1px solid #fffbed;box-shadow:0 3px 12px #34482720;transition:transform .15s ease-out;pointer-events:none}
+#joystick.active{opacity:1}#joystick.active span{transition:none}
+#touch-action{position:absolute;right:max(22px,env(safe-area-inset-right));bottom:calc(40px + env(safe-area-inset-bottom));width:126px;min-height:78px;padding:14px;border-radius:32px;border:1px solid #fffbedaa;background:#f8f5e7d9;box-shadow:0 3px 20px #34482718;font-size:14px;line-height:1.4;touch-action:none;opacity:.85}
+#touch-action:active{opacity:1;background:#fffbed}#touch-action:disabled{opacity:.4}
+.touch-controls .inventory{top:calc(14px + env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left))}
+.touch-controls .top-right{top:calc(14px + env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right))}
+.touch-controls .location{top:calc(85px + env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left))}
+.touch-controls #message{bottom:calc(185px + env(safe-area-inset-bottom));width:max-content;max-width:calc(100% - 32px);font-size:16px}
+.touch-controls #home-direction{bottom:calc(175px + env(safe-area-inset-bottom));left:max(18px,env(safe-area-inset-left))}
+.touch-controls #home-direction:not([hidden])~#save-note{max-width:190px}
+.touch-controls #reward{top:calc(90px + env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right))}
+.touch-controls #save-note{top:calc(118px + env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right))}
+.touch-controls .landing-header{top:calc(16px + env(safe-area-inset-top))}
+@media(max-width:380px){.inventory{gap:8px;padding:10px}.counter svg{width:22px}.top-right{gap:6px}.kindness{min-width:76px;padding:10px;gap:6px}#joystick{width:128px;height:128px;left:max(16px,env(safe-area-inset-left))}#touch-action{right:max(16px,env(safe-area-inset-right));width:116px}}
+@media(max-height:540px){
+  .landing-header{top:max(10px,env(safe-area-inset-top));left:max(20px,env(safe-area-inset-left))}.landing-header .wordmark{font-size:18px}.edition,.landing-footer,.scene-caption{display:none}
+  .welcome{top:75px;left:max(28px,env(safe-area-inset-left));right:max(28px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));transform:none;overflow:auto;pointer-events:auto;touch-action:pan-y}
+  .welcome h1{font-size:52px;margin:12px 0;letter-spacing:-3px}.welcome h1 br{display:none}.title-flower,.welcome .intro,.welcome .no-pressure{display:none}.welcome .tagline{font-size:18px;margin-bottom:12px}.welcome .touch-hint{margin:8px 0;font-size:11px}.welcome .touch-hint br{display:none}
+  .touch-controls .inventory{padding:8px 12px;gap:12px}.touch-controls .counter-label{display:none}.touch-controls .kindness{padding:8px 12px;min-width:90px}.touch-controls .location{display:none}
+  #joystick{width:120px;height:120px;bottom:calc(14px + env(safe-area-inset-bottom))}#joystick span{width:50px;height:50px}#touch-action{bottom:calc(25px + env(safe-area-inset-bottom));min-height:68px}
+  .touch-controls #message{bottom:calc(26px + env(safe-area-inset-bottom));max-width:calc(100% - 330px);font-size:14px;padding:10px 14px}
+  .touch-controls #home-direction{bottom:calc(148px + env(safe-area-inset-bottom))}.menu-card{padding:20px 28px}
+}
+.touch-controls #home-direction{top:calc(112px + env(safe-area-inset-top));bottom:auto}
+@media(max-height:540px){.touch-controls #home-direction{top:calc(78px + env(safe-area-inset-top))}}
